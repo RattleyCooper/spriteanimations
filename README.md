@@ -13,21 +13,24 @@ import vmath
 import framecounter
 
 var animationClock = FrameCounter(fps:6)
-var idleAnimation = newAnimatedSprite("idle", 0, 0, ivec2(0, 0), 24, 24, 4)
-var runAnimation = newAnimatedSprite("run", 0, 3, ivec2(0, 0), 24, 24, 13)
+var idleAnimation = newAnimatedSprite("idle", 0, 0, 24, 24, 4)
+var runAnimation = newAnimatedSprite("run", 0, 3, 24, 24, 13)
 
-var renderer = animationClock.newSpriteRenderer(idleAnimation, runAnimation)
+var playerAnimation = animationClock.newSpriteAnimation(ivec2(5, 5), idleAnimation, runAnimation)
 var delta: float32
 
-# Hook our frame counter and update
-# renderer every counter frame to 
-# set next frame
-renderer.clock.run every(1) do():
-  renderer.update()
+# Create a renderer, which can be used to do
+# ysorting.
+var renderer = newAnimationRenderer(
+  playerAnimation
+)
+# finalize the renderer; creates callbacks to
+# update animations.
+renderer.finalize()
 
 proc gameInit() =
   loadSpriteSheet(0, "character0.png", 24, 24)
-  renderer.play("idle")
+  playerAnimation.play("idle")
 
 proc gameUpdate(dt: float32) =
   # process game input
@@ -36,9 +39,10 @@ proc gameUpdate(dt: float32) =
 
 proc gameDraw() =
   cls()
-  renderer.render()
-  renderer.clock.ControlFlow(delta)
-  renderer.clock.tick()
+
+  # Ysort based on SpriteAnimation.pos.y + SpriteAnimation.current.height
+  renderer.ysort()
+  renderer.process(delta) # Process animations
 
 nico.init(orgName, appName)
 nico.createWindow(appName, 200, 180, 3, false)
