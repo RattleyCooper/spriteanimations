@@ -14,6 +14,7 @@ type
     vflip*: bool
     frame*: int
     frames*: int
+    oneShot: bool
 
   SpriteAnimation* = object
     name*: string
@@ -31,18 +32,23 @@ proc `[]`(renderer: var AnimationRenderer, name: string): var SpriteAnimation =
 proc cmpSprite(a, b: SpriteAnimation): int =
   cmp(a.pos.y + a.current.height, b.pos.y + b.current.height)
 
-proc newAnimatedSprite*(name: string, index: int, start: int, w, h: int, frames: int): AnimatedSprite =
+proc newAnimatedSprite*(name: string, index: int, start: int, w, h: int, frames: int, oneShot: bool = false): AnimatedSprite =
   AnimatedSprite(
     name: name,
     index: index, start: start, 
     width: w, height: h,
     hflip: false, vflip: false,
     frame: start,
-    frames: frames
+    frames: frames,
+    oneShot: oneShot
   )
 
 proc play*(sprite: var AnimatedSprite, x: int, y: int) =
   setSpritesheet(sprite.index)
+  # Lock last frame of oneShots
+  if sprite.oneShot and sprite.frame - sprite.start == sprite.frames-1:
+    sprite.frame = sprite.start + sprite.frames - 1
+
   spr(sprite.frame, x, y, 1, 1, sprite.hflip, sprite.vflip)
 
 proc newSpriteAnimation*(clock: var FrameCounter, name: string, pos: IVec2, sprites: varargs[AnimatedSprite]): SpriteAnimation =
@@ -56,6 +62,11 @@ proc newSpriteAnimation*(clock: var FrameCounter, name: string, pos: IVec2, spri
     result.current = sprites[0]
 
 proc update*(renderer: var SpriteAnimation, shouldUpdate: bool = true) =
+  # Stop oneShots from updating frames.
+  if renderer.current.oneShot and renderer.current.frame - renderer.current.start == renderer.current.frames-1:
+    echo "not updating"
+    return
+
   renderer.current.frame += 1
   if renderer.current.frame - renderer.current.start > renderer.current.frames-1:
     renderer.current.frame = renderer.current.start
