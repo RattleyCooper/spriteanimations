@@ -81,8 +81,8 @@ proc play*(sprite: var SpriteAnimation, name: string) =
   sprite.current = sprite.animations[name]
   sprite.current.play(sprite.pos.x, sprite.pos.y)
 
-proc tick*(sprite: var SpriteAnimation) =
-  sprite.clock.tick()
+proc tick*(sprite: var SpriteAnimation, dt: float32) =
+  sprite.clock.tick(dt)
 
 proc ysort*(r: var AnimationRenderer): seq[SpriteAnimation] =
   for k, v in r.sprite.pairs():
@@ -93,8 +93,7 @@ proc process*(renderer: var AnimationRenderer, delta: float32, pauseAnimations: 
   for i, sprite in renderer.sprite.pairs():
     renderer.sprite[i].current.play(sprite.pos.x, sprite.pos.y)
     if pauseAnimations: continue
-    renderer.sprite[i].clock.ControlFlow(delta)
-    renderer.sprite[i].clock.tick()
+    renderer.sprite[i].clock.tick(delta)
 
 template finalize*(renderer: var AnimationRenderer) =
   for i, anim in renderer.sprite:
