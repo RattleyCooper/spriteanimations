@@ -43,6 +43,9 @@ proc newAnimatedSprite*(name: string, index: int, start: int, w, h: int, frames:
     oneShot: oneShot
   )
 
+proc reset*(a: var AnimatedSprite) =
+  a.frame = a.start
+
 proc play*(sprite: var AnimatedSprite, x: int, y: int) =
   setSpritesheet(sprite.index)
   # Lock last frame of oneShots
