@@ -60,15 +60,15 @@ proc play*(sprite: var Animation, x: int, y: int) =
     sprite.frame = sprite.start + sprite.frames - 1
   spr(sprite.frame, x, y, 1, 1, sprite.hflip, sprite.vflip)
 
-# proc newSprite*(name: string, pos: IVec2, animations: var TableRef[string, Animation]): Sprite =  
-#   result = Sprite(
-#     name: name, 
-#     x: pos.x, y: pos.y,
-#     animations: animations
-#   )
-#   for k, v in result.animations.pairs():
-#     result.current = v
-#     break
+proc newSprite*(name: string, pos: IVec2, animations: var TableRef[string, Animation]): Sprite =  
+  result = Sprite(
+    name: name, 
+    x: pos.x, y: pos.y,
+    animations: animations
+  )
+  for k, v in result.animations.pairs():
+    result.current = v
+    break
 
 proc newSprite*(name: string, pos: IVec2, animations: varargs[Animation]): Sprite =  
   result = Sprite(
