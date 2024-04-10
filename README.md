@@ -10,7 +10,6 @@
 ```nim
 import nico
 import vmath
-import framecounter
 import tables
 
 type
