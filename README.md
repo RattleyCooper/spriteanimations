@@ -23,21 +23,17 @@ var animationClock = FrameCounter[Player](fps:6)
 var idleAnimation = newAnimation("idle", 0, 0, 24, 24, 4)
 var runAnimation = newAnimation("run", 0, 3, 24, 24, 13)
 
-# Associate the animations.
-var playerAnimations = newTable[string, Animation]()
-playerAnimations["idle"] = idleAnimation
-playerAnimations["run"] = runAnimation
-
-var playerSprite = newSprite("player", ivec2(5, 5), playerAnimations)
+# Create our sprite
+var playerSprite = newSprite(
+  "player", 
+  ivec2(5, 5), 
+  idleAnimation,
+  runAnimation
+)
 var delta: float32
 
-# Create a table of the various sprites 
-# for our renderer.
-var sprites = newTable[string, Sprite]()
-sprites["player"] = playerSprite
-
 # Create a renderer, which handles drawing/ysorting/zindex
-var renderer = newRenderer(sprites)
+var renderer = newRenderer(playerSprite)
 
 # The sprite's callback function for updating
 # the sprite's current animation frame.
@@ -46,7 +42,7 @@ animationClock.run playerSprite.every(1) do(sp: var Sprite):
 
 proc gameInit() =
   loadSpriteSheet(0, "character0.png", 24, 24)
-  renderer.sprite["player"].play("idle")
+  playerSprite.play("idle")
 
 proc gameUpdate(dt: float32) =
   # process game input
