@@ -39,7 +39,8 @@ sprites["player"] = playerSprite
 # Create a renderer, which handles drawing/ysorting/zindex
 var renderer = newRenderer(sprites)
 
-# Create callbacks on the animation clock for every sprite animation
+# The sprite's callback function for updating
+# the sprite's current animation frame.
 animationClock.run playerSprite.every(1) do(sp: var Sprite):
   sp.update()
 
@@ -55,10 +56,11 @@ proc gameUpdate(dt: float32) =
 proc gameDraw() =
   cls()
 
-  # Draw sprites
+  # Draw current animation frame for each sprite
   renderer.draw(delta)
 
-  # Proceed with sprite animation
+  # The FrameCounter will call each callback
+  # 6 times per second, animating our sprite.
   animationClock.tick(delta) 
 
 nico.init(orgName, appName)
