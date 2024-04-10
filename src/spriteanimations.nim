@@ -18,12 +18,16 @@ type
 
   SpriteAnimation* = ref object
     name*: string
-    pos*: IVec2
+    x*: int
+    y*: int
     current*: AnimatedSprite
     animations*: TableRef[string, AnimatedSprite]
 
   AnimationRenderer* = ref object
     sprite*: TableRef[string, SpriteAnimation]
+
+proc pos*(sprite: SpriteAnimation): IVec2 =
+  ivec2(sprite.x, sprite.y)
 
 proc `[]`*(renderer: var AnimationRenderer, name: string): var SpriteAnimation =
   renderer.sprite[name]
@@ -32,7 +36,7 @@ proc `[]=`*(renderer: var AnimationRenderer, name: string, value: var SpriteAnim
   renderer.sprite[name] = value
 
 proc cmpSprite(a, b: SpriteAnimation): int =
-  cmp(a.pos.y + a.current.height, b.pos.y + b.current.height)
+  cmp(a.y + a.current.height, b.y + b.current.height)
 
 proc newAnimatedSprite*(name: string, index: int, start: int, w, h: int, frames: int, oneShot: bool = false, zindex: int=0): AnimatedSprite =
   AnimatedSprite(
@@ -59,7 +63,7 @@ proc play*(sprite: var AnimatedSprite, x: int, y: int) =
 proc newSpriteAnimation*(name: string, pos: IVec2, sprites: var TableRef[string, AnimatedSprite]): SpriteAnimation =  
   result = SpriteAnimation(
     name: name, 
-    pos: pos, 
+    x: pos.x, y: pos.y,
     animations: sprites
   )
   for k, v in result.animations.pairs():
@@ -77,13 +81,13 @@ proc update*(renderer: var SpriteAnimation, shouldUpdate: bool = true) =
     renderer.current.frame = renderer.current.start
 
 proc play*(sprite: var SpriteAnimation) =
-  sprite.current.play(sprite.pos.x, sprite.pos.y)
+  sprite.current.play(sprite.x, sprite.y)
 
 proc play*(sprite: var SpriteAnimation, name: string) =
   let hflip = sprite.current.hflip
   sprite.current = sprite.animations[name]
   sprite.current.hflip = hflip
-  sprite.current.play(sprite.pos.x, sprite.pos.y)
+  sprite.current.play(sprite.x, sprite.y)
 
 proc ysort*(r: var AnimationRenderer): seq[SpriteAnimation] =
   var zsorted: Table[int, seq[SpriteAnimation]]
@@ -105,7 +109,7 @@ proc ysort*(r: var AnimationRenderer): seq[SpriteAnimation] =
 proc draw*(renderer: var AnimationRenderer, delta: float32) =
   var sprites = renderer.ysort()
   for sprite in sprites:
-    renderer.sprite[sprite.name].current.play(sprite.pos.x, sprite.pos.y)
+    renderer.sprite[sprite.name].current.play(sprite.x, sprite.y)
       
 proc newAnimationRenderer*(animations: var TableRef[string, SpriteAnimation]): AnimationRenderer =
   result = AnimationRenderer(
