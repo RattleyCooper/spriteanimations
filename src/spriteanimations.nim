@@ -4,7 +4,7 @@ import framecounter
 import nico
 
 type
-  AnimatedSprite* = object
+  AnimatedSprite* = ref object
     name*: string
     index*: int
     start*: int
@@ -17,17 +17,16 @@ type
     oneShot: bool
     zindex*: int
 
-  SpriteAnimation* = object
+  SpriteAnimation* = ref object
     name*: string
     pos*: IVec2
     current*: AnimatedSprite
-    animations*: Table[string, AnimatedSprite]
-    clock*: FrameCounter[SpriteAnimation]
+    animations*: TableRef[string, AnimatedSprite]
 
-  AnimationRenderer* = object
-    sprite*: Table[string, SpriteAnimation]
+  AnimationRenderer* = ref object
+    sprite*: TableRef[string, SpriteAnimation]
 
-proc `[]`(renderer: var AnimationRenderer, name: string): var SpriteAnimation =
+proc `[]`*(renderer: var AnimationRenderer, name: string): var SpriteAnimation =
   renderer.sprite[name]
 
 proc cmpSprite(a, b: SpriteAnimation): int =
@@ -55,15 +54,15 @@ proc play*(sprite: var AnimatedSprite, x: int, y: int) =
     sprite.frame = sprite.start + sprite.frames - 1
   spr(sprite.frame, x, y, 1, 1, sprite.hflip, sprite.vflip)
 
-proc newSpriteAnimation*(clock: var FrameCounter[SpriteAnimation], name: string, pos: IVec2, sprites: varargs[AnimatedSprite]): SpriteAnimation =
+proc newSpriteAnimation*(name: string, pos: IVec2, sprites: var TableRef[string, AnimatedSprite]): SpriteAnimation =  
   result = SpriteAnimation(
-    name: name, clock: clock, pos: pos
+    name: name, 
+    pos: pos, 
+    animations: sprites
   )
-  for sprite in sprites:
-    result.animations[sprite.name] = sprite
-
-  if result.animations.len > 0:
-    result.current = sprites[0]
+  for k, v in result.animations.pairs():
+    result.current = v
+    break
 
 proc update*(renderer: var SpriteAnimation, shouldUpdate: bool = true) =
   # Stop oneShots from updating frames.
@@ -84,9 +83,6 @@ proc play*(sprite: var SpriteAnimation, name: string) =
   sprite.current.hflip = hflip
   sprite.current.play(sprite.pos.x, sprite.pos.y)
 
-proc tick*(sprite: var SpriteAnimation, dt: float32) =
-  sprite.clock.tick(dt)
-
 proc ysort*(r: var AnimationRenderer): seq[SpriteAnimation] =
   var zsorted: Table[int, seq[SpriteAnimation]]
   var lowz: int
@@ -104,27 +100,13 @@ proc ysort*(r: var AnimationRenderer): seq[SpriteAnimation] =
       l.sort(cmpSprite, Ascending)
       result.add l
 
-proc process*(renderer: var AnimationRenderer, delta: float32, pauseAnimations: bool = true) =
+proc draw*(renderer: var AnimationRenderer, delta: float32) =
   var sprites = renderer.ysort()
   for sprite in sprites:
     renderer.sprite[sprite.name].current.play(sprite.pos.x, sprite.pos.y)
-    if pauseAnimations: continue
-    renderer.sprite[sprite.name].clock.tick(delta)
-
-
-proc add*(renderer: var AnimationRenderer, sprite: var SpriteAnimation) =
-  renderer.sprite[sprite.name] = sprite
-  renderer.sprite[sprite.name].clock.run sprite.every(1) do(sp: var SpriteAnimation):
-    renderer.sprite[sprite.name].update()
-
-template finalize*(renderer: var AnimationRenderer) =
-  for i, anim in renderer.sprite.pairs():
-    renderer.sprite[i].clock.run renderer.sprite[i].every(1) do(sp: var SpriteAnimation):
-      renderer.sprite[i].update()
       
-
-proc newAnimationRenderer*(animations: varargs[SpriteAnimation]): AnimationRenderer =
-  result = AnimationRenderer()
-  for anim in animations:
-    result.sprite[anim.name] = anim
+proc newAnimationRenderer*(animations: var TableRef[string, SpriteAnimation]): AnimationRenderer =
+  result = AnimationRenderer(
+    sprite: animations
+  )
 
