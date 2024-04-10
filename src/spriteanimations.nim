@@ -1,6 +1,5 @@
 import std/[algorithm, tables]
 import vmath
-import framecounter
 import nico
 
 type
