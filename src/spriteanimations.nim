@@ -29,6 +29,9 @@ type
 proc `[]`*(renderer: var AnimationRenderer, name: string): var SpriteAnimation =
   renderer.sprite[name]
 
+proc `[]=`*(renderer: var AnimationRenderer, name: string, value: var SpriteAnimation) =
+  renderer.sprite[name] = value
+
 proc cmpSprite(a, b: SpriteAnimation): int =
   cmp(a.pos.y + a.current.height, b.pos.y + b.current.height)
 
