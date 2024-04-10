@@ -28,7 +28,7 @@ var playerAnimations = newTable[string, Animation]()
 playerAnimations["idle"] = idleAnimation
 playerAnimations["run"] = runAnimation
 
-var playerSprite = newSprite("player", ivec2(5, 5), playerSprites)
+var playerSprite = newSprite("player", ivec2(5, 5), playerAnimations)
 var delta: float32
 
 var sprites = newTable[string, Sprite]()
