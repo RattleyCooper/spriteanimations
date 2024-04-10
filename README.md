@@ -31,14 +31,16 @@ playerAnimations["run"] = runAnimation
 var playerSprite = newSprite("player", ivec2(5, 5), playerAnimations)
 var delta: float32
 
+# Create a table of the various sprites 
+# for our renderer.
 var sprites = newTable[string, Sprite]()
 sprites["player"] = playerSprite
 
-# Create a renderer, which is used for drawing/ysorting/zindex
+# Create a renderer, which handles drawing/ysorting/zindex
 var renderer = newRenderer(sprites)
 
 # Create callbacks on the animation clock for every sprite animation
-animationClock.run playerAnimations.every(1) do(sp: var Sprite):
+animationClock.run playerSprite.every(1) do(sp: var Sprite):
   sp.update()
 
 proc gameInit() =
