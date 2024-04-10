@@ -11,22 +11,35 @@
 import nico
 import vmath
 import framecounter
+import tables
 
-var animationClock = FrameCounter(fps:6)
+type
+  Player = ref object
+
+# Play animations at 6 frames per second
+var animationClock = FrameCounter[Player](fps:6)
+
+# Create each sprite animation.
 var idleAnimation = newAnimatedSprite("idle", 0, 0, 24, 24, 4)
 var runAnimation = newAnimatedSprite("run", 0, 3, 24, 24, 13)
 
-var playerAnimation = animationClock.newSpriteAnimation("player", ivec2(5, 5), idleAnimation, runAnimation)
+# Associate the animations.
+var playerSprites = newTable[string, AnimatedSprite]()
+playerSprites["idle"] = idleAnimation
+playerSprites["run"] = runAnimation
+
+var playerAnimations = newSpriteAnimation("player", ivec2(5, 5), playerSprites)
 var delta: float32
 
-# Create a renderer, which can be used to do
-# ysorting.
-var renderer = newAnimationRenderer(
-  playerAnimation
-)
-# finalize the renderer; creates callbacks to
-# update animations.
-renderer.finalize()
+var animations = newTable[string, SpriteAnimation]()
+animations["player"] = playerAnimations
+
+# Create a renderer, which is used for drawing/ysorting/zindex
+var renderer = newAnimationRenderer(animations)
+
+# Create callbacks on the animation clock for every sprite animation
+animationClock.run playerAnimations.every(1) do(sp: var SpriteAnimation):
+  sp.update()
 
 proc gameInit() =
   loadSpriteSheet(0, "character0.png", 24, 24)
@@ -40,7 +53,11 @@ proc gameUpdate(dt: float32) =
 proc gameDraw() =
   cls()
 
-  renderer.process(delta) # Process animations
+  # Draw sprites
+  renderer.draw(delta)
+
+  # Proceed with sprite animation
+  animationClock.tick(delta) 
 
 nico.init(orgName, appName)
 nico.createWindow(appName, 200, 180, 3, false)
