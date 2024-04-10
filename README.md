@@ -24,18 +24,18 @@ var idleAnimation = newAnimation("idle", 0, 0, 24, 24, 4)
 var runAnimation = newAnimation("run", 0, 3, 24, 24, 13)
 
 # Associate the animations.
-var playerSprites = newTable[string, Animation]()
-playerSprites["idle"] = idleAnimation
-playerSprites["run"] = runAnimation
+var playerAnimations = newTable[string, Animation]()
+playerAnimations["idle"] = idleAnimation
+playerAnimations["run"] = runAnimation
 
-var playerAnimations = newSprite("player", ivec2(5, 5), playerSprites)
+var playerSprite = newSprite("player", ivec2(5, 5), playerSprites)
 var delta: float32
 
-var animations = newTable[string, Sprite]()
-animations["player"] = playerAnimations
+var sprites = newTable[string, Sprite]()
+sprites["player"] = playerSprite
 
 # Create a renderer, which is used for drawing/ysorting/zindex
-var renderer = newRenderer(animations)
+var renderer = newRenderer(sprites)
 
 # Create callbacks on the animation clock for every sprite animation
 animationClock.run playerAnimations.every(1) do(sp: var Sprite):
