@@ -3,7 +3,7 @@ import vmath
 import nico
 
 type
-  AnimatedSprite* = ref object
+  Animation* = ref object
     name*: string
     index*: int
     start*: int
@@ -16,30 +16,30 @@ type
     oneShot: bool
     zindex*: int
 
-  SpriteAnimation* = ref object
+  Sprite* = ref object
     name*: string
     x*: int
     y*: int
-    current*: AnimatedSprite
-    animations*: TableRef[string, AnimatedSprite]
+    current*: Animation
+    animations*: TableRef[string, Animation]
 
-  AnimationRenderer* = ref object
-    sprite*: TableRef[string, SpriteAnimation]
+  Renderer* = ref object
+    sprite*: TableRef[string, Sprite]
 
-proc pos*(sprite: SpriteAnimation): IVec2 =
+proc pos*(sprite: Sprite): IVec2 =
   ivec2(sprite.x, sprite.y)
 
-proc `[]`*(renderer: var AnimationRenderer, name: string): var SpriteAnimation =
+proc `[]`*(renderer: var Renderer, name: string): var Sprite =
   renderer.sprite[name]
 
-proc `[]=`*(renderer: var AnimationRenderer, name: string, value: var SpriteAnimation) =
+proc `[]=`*(renderer: var Renderer, name: string, value: var Sprite) =
   renderer.sprite[name] = value
 
-proc cmpSprite(a, b: SpriteAnimation): int =
+proc cmpSprite(a, b: Sprite): int =
   cmp(a.y + a.current.height, b.y + b.current.height)
 
-proc newAnimatedSprite*(name: string, index: int, start: int, w, h: int, frames: int, oneShot: bool = false, zindex: int=0): AnimatedSprite =
-  AnimatedSprite(
+proc newAnimation*(name: string, index: int, start: int, w, h: int, frames: int, oneShot: bool = false, zindex: int=0): Animation =
+  Animation(
     name: name,
     index: index, start: start, 
     width: w, height: h,
@@ -50,18 +50,18 @@ proc newAnimatedSprite*(name: string, index: int, start: int, w, h: int, frames:
     zindex: zindex
   )
 
-proc reset*(a: var AnimatedSprite) =
+proc reset*(a: var Animation) =
   a.frame = a.start
 
-proc play*(sprite: var AnimatedSprite, x: int, y: int) =
+proc play*(sprite: var Animation, x: int, y: int) =
   setSpritesheet(sprite.index)
   # Lock last frame of oneShots
   if sprite.oneShot and sprite.frame - sprite.start == sprite.frames-1:
     sprite.frame = sprite.start + sprite.frames - 1
   spr(sprite.frame, x, y, 1, 1, sprite.hflip, sprite.vflip)
 
-proc newSpriteAnimation*(name: string, pos: IVec2, sprites: var TableRef[string, AnimatedSprite]): SpriteAnimation =  
-  result = SpriteAnimation(
+proc newSprite*(name: string, pos: IVec2, sprites: var TableRef[string, Animation]): Sprite =  
+  result = Sprite(
     name: name, 
     x: pos.x, y: pos.y,
     animations: sprites
@@ -70,7 +70,7 @@ proc newSpriteAnimation*(name: string, pos: IVec2, sprites: var TableRef[string,
     result.current = v
     break
 
-proc update*(renderer: var SpriteAnimation, shouldUpdate: bool = true) =
+proc update*(renderer: var Sprite, shouldUpdate: bool = true) =
   # Stop oneShots from updating frames.
   if renderer.current.oneShot and renderer.current.frame - renderer.current.start == renderer.current.frames-1:
     echo "not updating"
@@ -80,17 +80,17 @@ proc update*(renderer: var SpriteAnimation, shouldUpdate: bool = true) =
   if renderer.current.frame - renderer.current.start > renderer.current.frames-1:
     renderer.current.frame = renderer.current.start
 
-proc play*(sprite: var SpriteAnimation) =
+proc play*(sprite: var Sprite) =
   sprite.current.play(sprite.x, sprite.y)
 
-proc play*(sprite: var SpriteAnimation, name: string) =
+proc play*(sprite: var Sprite, name: string) =
   let hflip = sprite.current.hflip
   sprite.current = sprite.animations[name]
   sprite.current.hflip = hflip
   sprite.current.play(sprite.x, sprite.y)
 
-proc ysort*(r: var AnimationRenderer): seq[SpriteAnimation] =
-  var zsorted: Table[int, seq[SpriteAnimation]]
+proc ysort*(r: var Renderer): seq[Sprite] =
+  var zsorted: Table[int, seq[Sprite]]
   var lowz: int
   var highz: int
   for k, v in r.sprite.pairs():
@@ -106,13 +106,13 @@ proc ysort*(r: var AnimationRenderer): seq[SpriteAnimation] =
       l.sort(cmpSprite, Ascending)
       result.add l
 
-proc draw*(renderer: var AnimationRenderer, delta: float32) =
+proc draw*(renderer: var Renderer, delta: float32) =
   var sprites = renderer.ysort()
   for sprite in sprites:
     renderer.sprite[sprite.name].current.play(sprite.x, sprite.y)
       
-proc newAnimationRenderer*(animations: var TableRef[string, SpriteAnimation]): AnimationRenderer =
-  result = AnimationRenderer(
+proc newRenderer*(animations: var TableRef[string, Sprite]): Renderer =
+  result = Renderer(
     sprite: animations
   )
 
