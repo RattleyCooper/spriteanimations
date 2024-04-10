@@ -11,6 +11,7 @@
 import nico
 import vmath
 import tables
+import framecounter
 
 type
   Player = ref object
