@@ -17,7 +17,7 @@ type
   Player = ref object
 
 # Play animations at 6 frames per second
-var animationClock = FrameCounter[Player](fps:6)
+var animationClock = FrameCounter[Sprite](fps:6)
 
 # Create each animation.
 var idleAnimation = newAnimation("idle", 0, 0, 24, 24, 4)
