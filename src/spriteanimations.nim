@@ -85,7 +85,6 @@ proc newSprite*(name: string, pos: IVec2, animations: varargs[Animation]): Sprit
 proc update*(renderer: var Sprite, shouldUpdate: bool = true) =
   # Stop oneShots from updating frames.
   if renderer.current.oneShot and renderer.current.frame - renderer.current.start == renderer.current.frames-1:
-    echo "not updating"
     return
 
   renderer.current.frame += 1
