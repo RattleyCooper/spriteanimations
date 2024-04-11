@@ -54,6 +54,14 @@ proc reset*(a: var Sprite) =
 
 proc play*(sprite: var Sprite, x: int, y: int) =
   setSpritesheet(sprite.current.index)
+  # Reset animations if they're out of bounds
+  # This happens when animations switch and
+  # will cause frames to get dropped if it's
+  # not here.
+  if sprite.current.start + sprite.current.frames - 1 < sprite.frame:
+    sprite.frame = sprite.current.start
+  elif sprite.frame < sprite.current.start:
+    sprite.frame = sprite.current.start
   # Lock last frame of oneShots
   if sprite.current.oneShot and sprite.frame - sprite.current.start == sprite.current.frames-1:
     sprite.frame = sprite.current.start + sprite.current.frames - 1
