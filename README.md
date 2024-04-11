@@ -19,7 +19,6 @@ type
     x: int
     y: int
 
-
 # Play animations at 6 frames per second
 var animationClock = FrameCounter[Sprite](fps:6)
 
@@ -37,7 +36,7 @@ var runAnimation = newAnimation("run", 0, 3, 24, 24, 13)
 # on the spritesheet. The Sprite will handle
 # tracking which frame should be displayed.
 
-# Create our sprite
+# Create our player sprite
 var playerSprite = newSprite(
   "player", 
   ivec2(5, 5), 
@@ -45,15 +44,20 @@ var playerSprite = newSprite(
   runAnimation
 )
 
+# Create our player
 var player = Player(x: 50, y: 50, sprite: playerSprite)
 
-var delta: float32
-
-# Create a renderer, which handles drawing/ysorting/zindex
+# Add our player sprite to the renderer, 
+# which will handle drawing/ysorting/zindex
 var renderer = newRenderer(playerSprite)
+
+# renderer.ysorted = false  if no ysorting
 
 # The sprite's callback function for updating
 # the sprite's current animation frame.
+# You can use any method you want, but calling
+# Sprite.update() will move the animation to 
+# the next frame.
 animationClock.run playerSprite.every(1) do(sp: var Sprite):
   sp.update()
 
@@ -62,11 +66,11 @@ playerClock.run player.every(1) do(p: var Player):
   p.sprite.x = p.x
   p.sprite.y = p.y
 
-
 proc gameInit() =
   loadSpriteSheet(0, "character0.png", 24, 24)
   player.sprite.play("idle")
 
+var delta: float32
 proc gameUpdate(dt: float32) =
   if btn(pcLeft):
     player.x -= 1
