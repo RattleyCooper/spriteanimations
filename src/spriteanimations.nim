@@ -9,9 +9,6 @@ type
     start*: int
     width*: int
     height*: int
-    hflip*: bool
-    vflip*: bool
-    frame*: int
     frames*: int
     oneShot: bool
     zindex*: int
@@ -20,6 +17,9 @@ type
     name*: string
     x*: int
     y*: int
+    hflip*: bool
+    vflip*: bool
+    frame*: int
     current*: Animation
     animations*: TableRef[string, Animation]
 
@@ -43,28 +43,27 @@ proc newAnimation*(name: string, index: int, start: int, w, h: int, frames: int,
     name: name,
     index: index, start: start, 
     width: w, height: h,
-    hflip: false, vflip: false,
-    frame: start,
     frames: frames,
     oneShot: oneShot,
     zindex: zindex
   )
 
-proc reset*(a: var Animation) =
-  a.frame = a.start
+proc reset*(a: var Sprite) =
+  a.frame = a.current.start
 
-proc play*(sprite: var Animation, x: int, y: int) =
-  setSpritesheet(sprite.index)
+proc play*(sprite: var Sprite, x: int, y: int) =
+  setSpritesheet(sprite.current.index)
   # Lock last frame of oneShots
-  if sprite.oneShot and sprite.frame - sprite.start == sprite.frames-1:
-    sprite.frame = sprite.start + sprite.frames - 1
+  if sprite.current.oneShot and sprite.frame - sprite.current.start == sprite.current.frames-1:
+    sprite.frame = sprite.current.start + sprite.current.frames - 1
   spr(sprite.frame, x, y, 1, 1, sprite.hflip, sprite.vflip)
 
 proc newSprite*(name: string, pos: IVec2, animations: var TableRef[string, Animation]): Sprite =  
   result = Sprite(
     name: name, 
     x: pos.x, y: pos.y,
-    animations: animations
+    animations: animations,
+    hflip: false, vflip: false
   )
   for k, v in result.animations.pairs():
     result.current = v
@@ -74,6 +73,7 @@ proc newSprite*(name: string, pos: IVec2, animations: varargs[Animation]): Sprit
   result = Sprite(
     name: name, 
     x: pos.x, y: pos.y,
+    hflip: false, vflip: false,
     animations: newTable[string, Animation]()
   )
   for anim in animations:
@@ -82,23 +82,23 @@ proc newSprite*(name: string, pos: IVec2, animations: varargs[Animation]): Sprit
     result.current = v
     break
 
-proc update*(renderer: var Sprite, shouldUpdate: bool = true) =
+proc update*(sprite: var Sprite, shouldUpdate: bool = true) =
   # Stop oneShots from updating frames.
-  if renderer.current.oneShot and renderer.current.frame - renderer.current.start == renderer.current.frames-1:
+  if sprite.current.oneShot and sprite.frame - sprite.current.start == sprite.current.frames-1:
     return
 
-  renderer.current.frame += 1
-  if renderer.current.frame - renderer.current.start > renderer.current.frames-1:
-    renderer.current.frame = renderer.current.start
+  sprite.frame += 1
+  if sprite.frame - sprite.current.start > sprite.current.frames-1:
+    sprite.frame = sprite.current.start
 
 proc play*(sprite: var Sprite) =
-  sprite.current.play(sprite.x, sprite.y)
+  sprite.play(sprite.x, sprite.y)
 
 proc play*(sprite: var Sprite, name: string) =
-  let hflip = sprite.current.hflip
+  let hflip = sprite.hflip
   sprite.current = sprite.animations[name]
-  sprite.current.hflip = hflip
-  sprite.current.play(sprite.x, sprite.y)
+  sprite.hflip = hflip
+  sprite.play(sprite.x, sprite.y)
 
 proc ysort*(r: var Renderer): seq[Sprite] =
   var zsorted: Table[int, seq[Sprite]]
@@ -120,7 +120,7 @@ proc ysort*(r: var Renderer): seq[Sprite] =
 proc draw*(renderer: var Renderer, delta: float32) =
   var sprites = renderer.ysort()
   for sprite in sprites:
-    renderer.sprite[sprite.name].current.play(sprite.x, sprite.y)
+    renderer.sprite[sprite.name].play(sprite.x, sprite.y)
 
 proc newRenderer*(sprites: varargs[Sprite]): Renderer =
   result = Renderer(sprite: newTable[string, Sprite]())
