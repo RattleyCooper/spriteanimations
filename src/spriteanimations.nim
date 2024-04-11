@@ -24,6 +24,7 @@ type
     animations*: TableRef[string, Animation]
 
   Renderer* = ref object
+    ysorted*: bool
     sprite*: TableRef[string, Sprite]
 
 proc pos*(sprite: Sprite): IVec2 =
@@ -118,17 +119,25 @@ proc ysort*(r: var Renderer): seq[Sprite] =
       result.add l
 
 proc draw*(renderer: var Renderer, delta: float32) =
-  var sprites = renderer.ysort()
-  for sprite in sprites:
-    renderer.sprite[sprite.name].play(sprite.x, sprite.y)
+  if renderer.ysorted:
+    var sprites = renderer.ysort()
+    for sprite in sprites:
+      renderer.sprite[sprite.name].play(sprite.x, sprite.y)
+  else:
+    for sprite in renderer.sprite.values():
+      renderer.sprite[sprite.name].play(sprite.x, sprite.y)
 
 proc newRenderer*(sprites: varargs[Sprite]): Renderer =
-  result = Renderer(sprite: newTable[string, Sprite]())
+  result = Renderer(
+    sprite: newTable[string, Sprite](),
+    ysorted: true
+  )
   for sprite in sprites:
     result.sprite[sprite.name] = sprite
 
 proc newRenderer*(animations: var TableRef[string, Sprite]): Renderer =
   result = Renderer(
-    sprite: animations
+    sprite: animations,
+    ysorted: true
   )
 
