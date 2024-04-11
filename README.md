@@ -25,7 +25,9 @@ var animationClock = FrameCounter[Sprite](fps:6)
 # Run things on Player's at 60fps
 var playerClock = FrameCounter[Player](fps: 60)
 
-# Create each animation.
+# Define the bounds/frames of the animations.
+# and give them names to use when we want to
+# display them.
 var idleAnimation = newAnimation("idle", 0, 0, 24, 24, 4)
 var runAnimation = newAnimation("run", 0, 3, 24, 24, 13)
 
