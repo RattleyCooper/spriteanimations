@@ -7,6 +7,8 @@
 
 ## Example
 
+![example image](https://github.com/RattleyCooper/spriteanimations/blob/main/assets/game.gif?raw=true)
+
 ```nim
 import nico
 import vmath
