@@ -3,6 +3,16 @@ import vmath
 import nico
 
 type
+  DisplayText* = ref object
+    text*: seq[string]
+    color*: int
+
+  TextBillboard* = ref object
+    text*: DisplayText
+    printCb*: proc(location: IVec2, text: DisplayText)
+    display*: bool
+    offset*: IVec2
+
   Animation* = ref object
     name*: string
     index*: int
@@ -22,6 +32,7 @@ type
     frame*: int
     current*: Animation
     animations*: TableRef[string, Animation]
+    billboard*: TextBillboard
 
   Renderer* = ref object
     ysorted*: bool
@@ -66,24 +77,33 @@ proc play*(sprite: var Sprite, x: int, y: int) =
   if sprite.current.oneShot and sprite.frame - sprite.current.start == sprite.current.frames-1:
     sprite.frame = sprite.current.start + sprite.current.frames - 1
   spr(sprite.frame, x, y, 1, 1, sprite.hflip, sprite.vflip)
+  
+  # Run billboard procs.
+  if sprite.billboard.display:
+    let location = ivec2(
+      x + sprite.billboard.offset.x,
+      y + sprite.billboard.offset.y
+    )
+    sprite.billboard.printCb(location, sprite.billboard.text)
 
-proc newSprite*(name: string, pos: IVec2, animations: var TableRef[string, Animation]): Sprite =  
-  result = Sprite(
-    name: name, 
-    x: pos.x, y: pos.y,
-    animations: animations,
-    hflip: false, vflip: false
+proc newBillboard*(cb: proc(location: IVec2, text: DisplayText)): TextBillboard =
+  TextBillboard(
+    text: DisplayText(text: @[], color: 0), 
+    display: false, 
+    offset: ivec2(0, 0),
+    printCb: cb
   )
-  for k, v in result.animations.pairs():
-    result.current = v
-    break
+
+proc centerp*(location: IVec2, text: DisplayText) =
+  printc($text.text, location.x, location.y)
 
 proc newSprite*(name: string, pos: IVec2, animations: varargs[Animation]): Sprite =  
   result = Sprite(
     name: name, 
     x: pos.x, y: pos.y,
     hflip: false, vflip: false,
-    animations: newTable[string, Animation]()
+    animations: newTable[string, Animation](),
+    billboard: newBillboard centerp
   )
   for anim in animations:
     result.animations[anim.name] = anim
@@ -142,10 +162,3 @@ proc newRenderer*(sprites: varargs[Sprite]): Renderer =
   )
   for sprite in sprites:
     result.sprite[sprite.name] = sprite
-
-proc newRenderer*(animations: var TableRef[string, Sprite]): Renderer =
-  result = Renderer(
-    sprite: animations,
-    ysorted: true
-  )
-
