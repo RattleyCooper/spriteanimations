@@ -1,5 +1,7 @@
 # spriteanimations
- Frame Locked Sprite Animations for Nico
+  Sprite Animations and rendering engine for 2.5D games in Nico.
+
+  Handles sprite animations, ysorting/zindexing, with text billboard support.
 
 <p align="center">
   <img src="https://github.com/RattleyCooper/spriteanimations/blob/main/assets/game.gif?raw=true">
