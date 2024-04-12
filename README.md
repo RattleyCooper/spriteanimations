@@ -7,7 +7,9 @@
 
 ## Example
 
-![example image](https://github.com/RattleyCooper/spriteanimations/blob/main/assets/game.gif?raw=true)
+<p align="center">
+  <img width="460" height="300" src="https://picsum.photos/460/300">
+</p>
 
 ```nim
 import nico
