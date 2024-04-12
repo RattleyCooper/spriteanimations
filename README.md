@@ -1,15 +1,15 @@
 # spriteanimations
  Frame Locked Sprite Animations for Nico
 
+<p align="center">
+  <img src="https://github.com/RattleyCooper/spriteanimations/blob/main/assets/game.gif?raw=true">
+</p>
+
 ## Install
 
 `nimble install https://github.com/RattleyCooper/spriteanimations`
 
 ## Example
-
-<p align="center">
-  <img src="https://github.com/RattleyCooper/spriteanimations/blob/main/assets/game.gif?raw=true">
-</p>
 
 ```nim
 import nico
