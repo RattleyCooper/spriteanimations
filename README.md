@@ -7,7 +7,6 @@
 
 ## Example
 
-![example image](https://github.com/RattleyCooper/spriteanimations/blob/main/assets/game.gif?raw=true)
 <p align="center">
   <img src="https://github.com/RattleyCooper/spriteanimations/blob/main/assets/game.gif?raw=true">
 </p>
