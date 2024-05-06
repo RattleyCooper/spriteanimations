@@ -94,6 +94,39 @@ proc newBillboard*(cb: proc(location: IVec2, text: DisplayText)): TextBillboard 
     printCb: cb
   )
 
+proc size*(animation: Animation): IVec2 =
+  ivec2(animation.width, animation.height)
+
+proc size*(sprite: var Sprite): IVec2 =
+  sprite.current.size
+
+proc center*(sprite: var Sprite): IVec2 =
+  ivec2(sprite.x + sprite.current.width div 2, sprite.y + sprite.current.height div 2)
+
+proc bottom*(sprite: var Sprite): IVec2 =
+  ivec2(sprite.x + sprite.current.width div 2, sprite.y + sprite.current.height)
+
+proc top*(sprite: var Sprite): IVec2 =
+  ivec2(sprite.x + sprite.current.width div 2, sprite.y)
+
+proc left*(sprite: var Sprite): IVec2 =
+  ivec2(sprite.x, sprite.y + sprite.current.height div 2)
+
+proc right*(sprite: var Sprite): IVec2 =
+  ivec2(sprite.x + sprite.current.width, sprite.y + sprite.current.height div 2)
+
+proc topLeft*(sprite: var Sprite): IVec2 =
+  ivec2(sprite.x, sprite.y)
+
+proc topRight*(sprite: var Sprite): IVec2 =
+  ivec2(sprite.x + sprite.current.width, sprite.y)
+
+proc bottomLeft*(sprite: var Sprite): IVec2 =
+  ivec2(sprite.x, sprite.y + sprite.current.height)
+
+proc bottomRight*(sprite: var Sprite): IVec2 =
+  ivec2(sprite.x + sprite.current.width, sprite.y + sprite.current.height)
+
 proc centerp*(location: IVec2, text: DisplayText) =
   printc($text.text, location.x, location.y)
 
@@ -146,14 +179,14 @@ proc ysort*(r: var Renderer): seq[Sprite] =
       l.sort(cmpSprite, Ascending)
       result.add l
 
+proc drawYSorted*(renderer: var Renderer, delta: float32) =
+  var sprites = renderer.ysort()
+  for sprite in sprites:
+    renderer.sprite[sprite.name].play(sprite.x, sprite.y)
+
 proc draw*(renderer: var Renderer, delta: float32) =
-  if renderer.ysorted:
-    var sprites = renderer.ysort()
-    for sprite in sprites:
-      renderer.sprite[sprite.name].play(sprite.x, sprite.y)
-  else:
-    for sprite in renderer.sprite.values():
-      renderer.sprite[sprite.name].play(sprite.x, sprite.y)
+  for sprite in renderer.sprite.values():
+    renderer.sprite[sprite.name].play(sprite.x, sprite.y)
 
 proc newRenderer*(sprites: varargs[Sprite]): Renderer =
   result = Renderer(
