@@ -26,10 +26,10 @@ type
     y: int
 
 # Play animations at 6 frames per second
-var animationClock = FrameCounter[Sprite](fps:6)
+var animationClock = FrameCounter(fps:6)
 
 # Run things on Player's at 60fps
-var playerClock = FrameCounter[Player](fps: 60)
+var playerClock = FrameCounter(fps: 60)
 
 # Define the bounds/frames of the animations.
 # and give them names to use when we want to
@@ -66,13 +66,13 @@ var renderer = newRenderer(playerSprite)
 # You can use any method you want, but calling
 # Sprite.update() will move the animation to 
 # the next frame.
-animationClock.run playerSprite.every(1) do(sp: var Sprite):
-  sp.update()
+animationClock.run every(1) do():
+  player.sprite.update()
 
 # Lock sprite to player position on every frame.
-playerClock.run player.every(1) do(p: var Player):
-  p.sprite.x = p.x
-  p.sprite.y = p.y
+playerClock.run every(1) do():
+  player.sprite.x = p.x
+  player.sprite.y = p.y
 
 proc gameInit() =
   loadSpriteSheet(0, "character0.png", 24, 24)
