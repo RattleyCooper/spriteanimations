@@ -71,14 +71,13 @@ animationClock.run every(1) do():
 
 # Lock sprite to player position on every frame.
 playerClock.run every(1) do():
-  player.sprite.x = p.x
-  player.sprite.y = p.y
+  player.sprite.x = player.x
+  player.sprite.y = player.y
 
 proc gameInit() =
   loadSpriteSheet(0, "character0.png", 24, 24)
   player.sprite.play("idle")
 
-var delta: float32
 proc gameUpdate(dt: float32) =
   if btn(pcLeft):
     player.x -= 1
@@ -90,10 +89,9 @@ proc gameUpdate(dt: float32) =
     player.sprite.hflip = false
   else:
     player.sprite.play("idle")
-  delta = dt
 
   # Call player callbacks.
-  playerClock.tick(dt)
+  playerClock.tick()
 
 proc gameDraw() =
   cls()
@@ -103,7 +101,7 @@ proc gameDraw() =
 
   # The FrameCounter will call each callback
   # 6 times per second, animating our sprite.
-  animationClock.tick(delta)
+  animationClock.tick()
 
 nico.init(orgName, appName)
 nico.createWindow(appName, 200, 180, 3, false)
