@@ -1,7 +1,7 @@
 import std/[algorithm, tables]
 import vmath
 import nico
-
+ 
 type
   DisplayText* = ref object
     text*: seq[string]
@@ -15,7 +15,6 @@ type
 
   Animation* = ref object
     name*: string
-    index*: int
     start*: int
     width*: int
     height*: int
@@ -25,6 +24,8 @@ type
 
   Sprite* = ref object
     name*: string
+    filepath*: string
+    index*: int
     x*: int
     y*: int
     hflip*: bool
@@ -49,10 +50,9 @@ proc `[]=`*(renderer: var Renderer, name: string, value: var Sprite) =
 proc cmpSprite(a, b: Sprite): int =
   cmp(a.y + a.current.height, b.y + b.current.height)
 
-proc newAnimation*(name: string, index: int, start: int, w, h: int, frames: int, oneShot: bool = false, zindex: int=0): Animation =
+proc newAnimation*(name: string, start: int, w, h: int, frames: int, oneShot: bool = false, zindex: int=0): Animation =
   Animation(
-    name: name,
-    index: index, start: start, 
+    name: name, start: start, 
     width: w, height: h,
     frames: frames,
     oneShot: oneShot,
@@ -63,7 +63,7 @@ proc reset*(a: var Sprite) =
   a.frame = a.current.start
 
 proc play*(sprite: var Sprite, x: int, y: int) =
-  setSpritesheet(sprite.current.index)
+  setSpritesheet(sprite.index)
   # Reset animations if they're out of bounds
   # This happens when animations switch and
   # will cause frames to get dropped if it's
@@ -130,8 +130,11 @@ proc centerp*(location: IVec2, text: DisplayText) =
   printc($text.text, location.x, location.y)
 
 proc newSprite*(name: string, pos: IVec2, animations: varargs[Animation]): Sprite =  
+proc newSprite*(name: string, filepath: string, index: int, pos: IVec2, animations: varargs[Animation]): Sprite =  
   result = Sprite(
     name: name, 
+    filepath: filepath,
+    index: index,
     x: pos.x, y: pos.y,
     hflip: false, vflip: false,
     animations: newTable[string, Animation](),
