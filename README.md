@@ -11,6 +11,10 @@
 
 `nimble install https://github.com/RattleyCooper/spriteanimations`
 
+## Use with Framecounter
+
+`https://github.com/RattleyCooper/framecounter`
+
 ## Example
 
 ```nim
