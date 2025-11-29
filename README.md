@@ -213,11 +213,10 @@ flowchart TD
     subgraph SPRITE["🟩 Sprite (Stateful)"]
         S1["Sprite
         • x, y
-        • z / ysort
+        • index
         • hflip/vflip
-        • currentAnim
-        • currentFrame
-        • spritesheetIndex"]
+        • current: Animation
+        • frame"]
     end
 
     subgraph TIMER["⏱️ FrameCounter"]
@@ -231,7 +230,7 @@ flowchart TD
     subgraph RENDER["🟧 Renderer (Stateless Draw System)"]
         R1["Renderer
         • sprite list
-        • ysorting
+        • drawYSort()
         • draw()"]
     end
 
