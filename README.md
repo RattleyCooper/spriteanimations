@@ -13,7 +13,7 @@
 
 ## Use with Framecounter
 
-`https://github.com/RattleyCooper/framecounter`
+`nimble install https://github.com/RattleyCooper/framecounter`
 
 ## Example
 
