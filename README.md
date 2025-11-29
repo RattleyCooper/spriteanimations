@@ -19,10 +19,10 @@ Built for fast prototyping, clean animation handling, and buttery-smooth charact
 Perfect for pixel-art games, 2.5D RPGs, isometric projects, and anything that moves.
 
 ## 📦 Install
-nimble install https://github.com/RattleyCooper/spriteanimations
+`nimble install https://github.com/RattleyCooper/spriteanimations`
 
 ## ⏱️ Optional (but highly recommended)
-nimble install https://github.com/RattleyCooper/framecounter
+`nimble install https://github.com/RattleyCooper/framecounter`
 
 Use framecounter for clean per-frame updates and deterministic animation timing.
 
