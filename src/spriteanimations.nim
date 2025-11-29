@@ -35,7 +35,6 @@ type
     billboard*: TextBillboard
 
   Renderer* = ref object
-    ysorted*: bool
     sprite*: TableRef[string, Sprite]
 
 proc pos*(sprite: Sprite): IVec2 =
@@ -179,19 +178,18 @@ proc ysort*(r: var Renderer): seq[Sprite] =
       l.sort(cmpSprite, Ascending)
       result.add l
 
-proc drawYSorted*(renderer: var Renderer, delta: float32) =
+proc drawYSorted*(renderer: var Renderer) =
   var sprites = renderer.ysort()
   for sprite in sprites:
     renderer.sprite[sprite.name].play(sprite.x, sprite.y)
 
-proc draw*(renderer: var Renderer, delta: float32) =
+proc draw*(renderer: var Renderer) =
   for sprite in renderer.sprite.values():
     renderer.sprite[sprite.name].play(sprite.x, sprite.y)
 
 proc newRenderer*(sprites: varargs[Sprite]): Renderer =
   result = Renderer(
-    sprite: newTable[string, Sprite](),
-    ysorted: true
+    sprite: newTable[string, Sprite]()
   )
   for sprite in sprites:
     result.sprite[sprite.name] = sprite
