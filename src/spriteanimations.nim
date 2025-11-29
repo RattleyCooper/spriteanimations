@@ -1,4 +1,4 @@
-import std/[algorithm, tables]
+import std/[algorithm, tables, sequtils]
 import vmath
 import nico
  
@@ -129,7 +129,20 @@ proc bottomRight*(sprite: var Sprite): IVec2 =
 proc centerp*(location: IVec2, text: DisplayText) =
   printc($text.text, location.x, location.y)
 
-proc newSprite*(name: string, pos: IVec2, animations: varargs[Animation]): Sprite =  
+proc initSpritesheets*(renderer: Renderer) =
+  # Load spritesheets contained in the renderer.
+  var animation: Animation
+  var loaded = newTable[string, int]() # filepath/index
+  for k, sprite in renderer.sprite.pairs():
+    let keys = sprite.animations.keys().toSeq()
+    animation = sprite.animations[keys[0]]
+    # Don't load multiples of same spritesheet.
+    if loaded.contains(sprite.filepath):
+      renderer.sprite[sprite.name].index = loaded[sprite.filepath]
+      continue
+    loadSpriteSheet(sprite.index, sprite.filepath, animation.width, animation.height)
+    loaded[sprite.filepath] = sprite.index
+
 proc newSprite*(name: string, filepath: string, index: int, pos: IVec2, animations: varargs[Animation]): Sprite =  
   result = Sprite(
     name: name, 
