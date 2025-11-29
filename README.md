@@ -3,6 +3,10 @@
 A lightweight 2.5D sprite animation and rendering engine for Nico.
 Built for fast prototyping, clean animation handling, and buttery-smooth character movement.
 
+<p align="center">
+  <img src="https://github.com/RattleyCooper/spriteanimations/blob/main/assets/game.gif?raw=true">
+</p>
+
 `spriteanimations` gives you:
 
 * 🎞️ Named animations (idle, run, attack, etc.)
